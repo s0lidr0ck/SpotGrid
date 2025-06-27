@@ -3,7 +3,7 @@ import { Calendar, DollarSign } from 'lucide-react';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Card from '../ui/Card';
-import { supabase } from '../../utils/supabase';
+import { apiClient } from '../../utils/api-client';
 import toast from 'react-hot-toast';
 
 interface Brand {
@@ -63,12 +63,9 @@ const EstimateForm: React.FC<EstimateFormProps> = ({
   const fetchBrands = async () => {
     try {
       setLoadingBrands(true);
-      const { data, error } = await supabase
-        .from('brands')
-        .select('id, common_name')
-        .order('common_name');
+      const { data, error } = await apiClient.getBrands();
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
       setBrands(data || []);
     } catch (error) {
       console.error('Error fetching brands:', error);
