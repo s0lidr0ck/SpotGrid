@@ -7,6 +7,10 @@ import { config } from './config.js';
 import authRoutes from './routes/auth.js';
 import estimatesRoutes from './routes/estimates.js';
 import brandsRoutes from './routes/brands.js';
+import daypartsRoutes from './routes/dayparts.js';
+import estimateItemsRoutes from './routes/estimate-items.js';
+import mediaRoutes from './routes/media.js';
+import paymentMethodRoutes from './routes/payment-methods.js';
 
 // Test database connection
 import './database.js';
@@ -23,8 +27,8 @@ app.use(cors({
 }));
 
 // Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '2gb' }));
+app.use(express.urlencoded({ extended: true, limit: '2gb' }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -39,6 +43,10 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/estimates', estimatesRoutes);
 app.use('/api/brands', brandsRoutes);
+app.use('/api/dayparts', daypartsRoutes);
+app.use('/api/estimate-items', estimateItemsRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/payment-methods', paymentMethodRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

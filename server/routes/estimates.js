@@ -76,9 +76,14 @@ router.get('/:id', authenticateToken, async (req, res) => {
       SELECT 
         e.*,
         b.common_name as brand_name,
-        b.legal_name as brand_legal_name
+        b.legal_name as brand_legal_name,
+        ma.filename as media_filename,
+        pm.brand as payment_brand,
+        pm.last4 as payment_last4
       FROM estimates e
       LEFT JOIN brands b ON e.brand_id = b.id
+      LEFT JOIN media_assets ma ON e.media_asset_id = ma.id
+      LEFT JOIN payment_methods pm ON e.payment_method_id = pm.id
       ${whereClause}
     `, params);
 
@@ -154,7 +159,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     // Build dynamic update query
     const allowedFields = [
       'estimate_name', 'start_date', 'end_date', 'total_spend', 
-      'total_estimated_cost', 'status', 'brand_id'
+      'total_estimated_cost', 'status', 'brand_id', 'media_asset_id', 'payment_method_id'
     ];
 
     allowedFields.forEach(field => {
@@ -162,6 +167,13 @@ router.put('/:id', authenticateToken, async (req, res) => {
         paramCount++;
         updates.push(`${field} = $${paramCount}`);
         params.push(req.body[field]);
+        
+        // Also update 'name' field when 'estimate_name' is updated
+        if (field === 'estimate_name') {
+          paramCount++;
+          updates.push(`name = $${paramCount}`);
+          params.push(req.body[field]);
+        }
       }
     });
 

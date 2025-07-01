@@ -82,9 +82,7 @@ router.post('/', authenticateToken, async (req, res) => {
       address,
       phone,
       email,
-      contact_first_name,
-      contact_last_name,
-      contact_job_title
+      contact_person
     } = req.body;
 
     if (!common_name || !legal_name) {
@@ -97,15 +95,13 @@ router.post('/', authenticateToken, async (req, res) => {
     const result = await query(`
       INSERT INTO brands (
         common_name, legal_name, address, phone, email,
-        contact_first_name, contact_last_name, contact_job_title,
-        owner_id, created_at, updated_at
+        contact_person, owner_id, created_at, updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
       RETURNING *
     `, [
       common_name, legal_name, address, phone, email,
-      contact_first_name, contact_last_name, contact_job_title,
-      req.user.id
+      contact_person, req.user.id
     ]);
 
     res.status(201).json({ data: result.rows[0], error: null });
@@ -142,7 +138,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     // Build dynamic update query
     const allowedFields = [
       'common_name', 'legal_name', 'address', 'phone', 'email',
-      'contact_first_name', 'contact_last_name', 'contact_job_title'
+      'contact_person'
     ];
 
     allowedFields.forEach(field => {

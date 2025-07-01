@@ -13,19 +13,19 @@ const DraftsView = () => {
 
   if (user?.role !== 'traffic_admin') {
     return <Navigate to="/dashboard" />;
-  }
+        }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <div>
+      <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center">
             <FileText className="mr-3" size={28} />
             Draft Management
           </h1>
-          <p className="text-gray-600 mt-1">
+        <p className="text-gray-600 mt-1">
             Review and manage draft estimates
-          </p>
+        </p>
         </div>
       </div>
 

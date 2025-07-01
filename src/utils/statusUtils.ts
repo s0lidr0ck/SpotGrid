@@ -1,23 +1,24 @@
 import { StatusBadge } from '../components/ui/StatusBadge';
 
-export type EstimateStatus = 'draft' | 'pending_approval' | 'approved' | 'rejected';
+export type EstimateStatus = 'draft' | 'pending_approval' | 'ordered' | 'modified' | 'approved' | 'rejected';
 
 export const STATUS_COLORS: Record<EstimateStatus, string> = {
-  draft: '#6c757d',
-  pending_approval: '#ff9800', 
-  approved: '#28a745',
-  rejected: '#dc3545'
+  draft: 'bg-gray-100 text-gray-800',
+  pending_approval: 'bg-yellow-100 text-yellow-800',
+  ordered: 'bg-blue-100 text-blue-800',
+  modified: 'bg-orange-100 text-orange-800',
+  approved: 'bg-green-100 text-green-800',
+  rejected: 'bg-red-100 text-red-800',
 };
 
-export const getStatusColor = (status: EstimateStatus): string => STATUS_COLORS[status] || '#6c757d';
+export const getStatusColor = (status: EstimateStatus): string => STATUS_COLORS[status] || 'bg-gray-100 text-gray-800';
 
 export const getStatusBgColor = (status: EstimateStatus): string => {
-  const hexColor = STATUS_COLORS[status];
-  if (!hexColor) return 'bg-gray-300';
-  
   switch (status) {
     case 'draft': return 'bg-gray-300';
-    case 'pending_approval': return 'bg-orange-100';
+    case 'pending_approval': return 'bg-yellow-100';
+    case 'ordered': return 'bg-blue-100';
+    case 'modified': return 'bg-orange-100';
     case 'approved': return 'bg-green-100';
     case 'rejected': return 'bg-red-100';
     default: return 'bg-gray-100';
@@ -27,6 +28,8 @@ export const getStatusBgColor = (status: EstimateStatus): string => {
 export const getStatusLabel = (status: EstimateStatus): string => {
   switch (status) {
     case 'pending_approval': return 'Pending Approval';
+    case 'ordered': return 'Ordered';
+    case 'modified': return 'Modified';
     default: return status.charAt(0).toUpperCase() + status.slice(1);
   }
 };
@@ -35,6 +38,9 @@ export const getNextStatuses = (status: EstimateStatus, isAdmin: boolean): Estim
   if (isAdmin) {
     switch (status) {
       case 'pending_approval':
+      case 'ordered':
+        return ['approved', 'rejected', 'modified'];
+      case 'modified':
         return ['approved', 'rejected'];
       default:
         return [];
@@ -43,7 +49,8 @@ export const getNextStatuses = (status: EstimateStatus, isAdmin: boolean): Estim
     switch (status) {
       case 'draft':
       case 'rejected':
-        return ['pending_approval'];
+      case 'modified':
+        return ['ordered']; // Submit order for approval
       default:
         return [];
     }
@@ -52,6 +59,6 @@ export const getNextStatuses = (status: EstimateStatus, isAdmin: boolean): Estim
 
 export const canEditEstimate = (status: EstimateStatus, isAdmin: boolean): boolean => {
   if (isAdmin) return true;
-  // Users can edit drafts and rejected orders
-  return ['draft', 'rejected'].includes(status);
+  // Users can edit drafts, rejected orders, and modified orders
+  return ['draft', 'rejected', 'modified'].includes(status);
 };

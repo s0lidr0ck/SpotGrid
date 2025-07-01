@@ -161,6 +161,144 @@ class ApiClient {
       method: 'DELETE',
     });
   }
+
+  // Dayparts
+  async getDayparts() {
+    return this.request<any[]>('/dayparts');
+  }
+
+  async getDaypart(id: string) {
+    return this.request<any>(`/dayparts/${id}`);
+  }
+
+  // Estimate Items (slot selections)
+  async getEstimateItems(estimateId: string) {
+    return this.request<any[]>(`/estimate-items/${estimateId}`);
+  }
+
+  async createEstimateItem(estimateId: string, data: any) {
+    return this.request<any>(`/estimate-items/${estimateId}`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async updateEstimateItem(estimateId: string, itemId: string, data: any) {
+    return this.request<any>(`/estimate-items/${estimateId}/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async deleteEstimateItem(estimateId: string, itemId: string) {
+    return this.request<{ id: string }>(`/estimate-items/${estimateId}/${itemId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Media Assets
+  async getMediaAssets(params?: { brand_id?: string; status?: string }) {
+    const searchParams = new URLSearchParams();
+    if (params?.brand_id) searchParams.set('brand_id', params.brand_id);
+    if (params?.status) searchParams.set('status', params.status);
+    
+    const query = searchParams.toString();
+    const endpoint = query ? `/media?${query}` : '/media';
+    
+    return this.request<any[]>(endpoint);
+  }
+
+  async getMediaAsset(id: string) {
+    return this.request<any>(`/media/${id}`);
+  }
+
+  async createMediaAsset(data: any) {
+    return this.request<any>('/media', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateMediaAsset(id: string, data: any) {
+    return this.request<any>(`/media/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteMediaAsset(id: string) {
+    return this.request<{ id: string }>(`/media/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getMediaAssetUrl(id: string) {
+    return this.request<{ url: string; expires_in: number }>(`/media/${id}/url`);
+  }
+
+  async getMediaAssetPreviewUrl(id: string, type: 'preview' | 'thumbnail' = 'preview') {
+    return this.request<{ url: string; expires_in: number; type: string }>(`/media/${id}/preview-url?type=${type}`);
+  }
+
+  async uploadMediaAsset(file: File, brandId: string, estimateId?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('brand_id', brandId);
+    if (estimateId) {
+      formData.append('estimate_id', estimateId);
+    }
+
+    return this.request<any>('/media/upload', {
+      method: 'POST',
+      headers: {
+        // Remove Content-Type to let browser set it with boundary for FormData
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+      },
+      body: formData,
+    });
+  }
+
+  // Payment Methods
+  async getPaymentMethods(params?: { brand_id?: string }) {
+    const searchParams = new URLSearchParams();
+    if (params?.brand_id) searchParams.set('brand_id', params.brand_id);
+    
+    const query = searchParams.toString();
+    const endpoint = query ? `/payment-methods?${query}` : '/payment-methods';
+    
+    return this.request<any[]>(endpoint);
+  }
+
+  async getPaymentMethod(id: string) {
+    return this.request<any>(`/payment-methods/${id}`);
+  }
+
+  async createPaymentMethod(data: any) {
+    return this.request<any>('/payment-methods', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updatePaymentMethod(id: string, data: any) {
+    return this.request<any>(`/payment-methods/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deletePaymentMethod(id: string) {
+    return this.request<{ id: string }>(`/payment-methods/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async validateCoupon(couponCode: string) {
+    return this.request<any>('/payment-methods/validate-coupon', {
+      method: 'POST',
+      body: JSON.stringify({ coupon_code: couponCode }),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

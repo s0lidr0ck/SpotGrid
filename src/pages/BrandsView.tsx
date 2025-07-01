@@ -15,9 +15,10 @@ interface Brand {
   address: string | null;
   phone: string | null;
   email: string | null;
-  contact_first_name: string | null;
-  contact_last_name: string | null;
-  contact_job_title: string | null;
+  contact_first_name?: string | null;
+  contact_last_name?: string | null;
+  contact_job_title?: string | null;
+  contact_person?: string | null;
   created_at: string;
   updated_at: string;
   has_orders?: boolean;
@@ -59,7 +60,22 @@ const BrandsView = () => {
   const handleCreateBrand = async (formData: Omit<Brand, 'id' | 'created_at' | 'updated_at' | 'has_orders' | 'owner_id'>) => {
     setIsSubmitting(true);
     try {
-      const { data, error } = await apiClient.createBrand(formData);
+      // Transform the form data to match the database schema
+      const transformedData = {
+        common_name: formData.common_name,
+        legal_name: formData.legal_name,
+        address: formData.address,
+        phone: formData.phone,
+        email: formData.email,
+        // Combine contact fields into contact_person
+        contact_person: [
+          formData.contact_first_name,
+          formData.contact_last_name,
+          formData.contact_job_title ? `(${formData.contact_job_title})` : ''
+        ].filter(Boolean).join(' ').trim()
+      };
+
+      const { data, error } = await apiClient.createBrand(transformedData);
 
       if (error) throw new Error(error.message);
       
@@ -79,7 +95,22 @@ const BrandsView = () => {
     
     setIsSubmitting(true);
     try {
-      const { data, error } = await apiClient.updateBrand(editingBrand.id, formData);
+      // Transform the form data to match the database schema
+      const transformedData = {
+        common_name: formData.common_name,
+        legal_name: formData.legal_name,
+        address: formData.address,
+        phone: formData.phone,
+        email: formData.email,
+        // Combine contact fields into contact_person
+        contact_person: [
+          formData.contact_first_name,
+          formData.contact_last_name,
+          formData.contact_job_title ? `(${formData.contact_job_title})` : ''
+        ].filter(Boolean).join(' ').trim()
+      };
+
+      const { data, error } = await apiClient.updateBrand(editingBrand.id, transformedData);
 
       if (error) throw new Error(error.message);
       
@@ -128,7 +159,7 @@ const BrandsView = () => {
   const filteredBrands = brands.filter(brand =>
     brand.common_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     brand.legal_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    `${brand.contact_first_name} ${brand.contact_last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
+    `${brand.contact_person}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -220,9 +251,9 @@ const BrandsView = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {brand.contact_first_name} {brand.contact_last_name}
+                        {brand.contact_person || `${brand.contact_first_name || ''} ${brand.contact_last_name || ''}`.trim()}
                       </div>
-                      <div className="text-sm text-gray-500">{brand.contact_job_title}</div>
+                      <div className="text-sm text-gray-500">{brand.contact_job_title || ''}</div>
                       <div className="text-sm text-gray-500">{brand.email}</div>
                       <div className="text-sm text-gray-500">{brand.phone}</div>
                     </td>
@@ -280,9 +311,7 @@ const BrandsView = () => {
                   address: editingBrand.address || '',
                   phone: editingBrand.phone || '',
                   email: editingBrand.email || '',
-                  contact_first_name: editingBrand.contact_first_name || '',
-                  contact_last_name: editingBrand.contact_last_name || '',
-                  contact_job_title: editingBrand.contact_job_title || ''
+                  contact_person: editingBrand.contact_person || '',
                 } : undefined}
                 onSubmit={editingBrand ? handleUpdateBrand : handleCreateBrand}
                 onCancel={() => {

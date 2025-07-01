@@ -10,10 +10,10 @@ const pool = new Pool({
   database: config.db.database,
   user: config.db.user,
   password: config.db.password,
-  ssl: false, // Set to true if your database requires SSL
+  ssl: config.db.ssl,
   max: 20, // Maximum number of clients in pool
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000, // Increased timeout
 });
 
 // Test connection on startup
@@ -23,7 +23,8 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
-  process.exit(-1);
+  // Don't exit the process - just log the error and continue
+  // The application can handle individual query failures gracefully
 });
 
 // Query helper function

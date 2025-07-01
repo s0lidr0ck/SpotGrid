@@ -10,7 +10,7 @@ const SubscriptionCard = () => {
           <CreditCard className="mr-2" size={20} />
           Subscription Status
         </h3>
-        
+
         <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
           <div className="flex items-start">
             <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />

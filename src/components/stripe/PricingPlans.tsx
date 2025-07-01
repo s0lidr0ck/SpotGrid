@@ -28,14 +28,14 @@ const PricingPlans = () => {
             <div className="flex items-center justify-center mb-2">
               <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
               <span className="text-blue-800 font-medium">Contact Sales</span>
-            </div>
+                </div>
             <p className="text-blue-700 text-sm">
               For pricing information and subscription options, please contact 
               our sales team directly.
             </p>
-          </div>
-        </div>
-      </Card>
+                  </div>
+              </div>
+            </Card>
     </div>
   );
 };
